@@ -1,4 +1,4 @@
-# CS207_FinalProject CS207_FinalProject 
+# CS207_FinalProject: Automatic Differentiation
 
 [![Build Status](https://travis-ci.org/XVQD/cs207-FinalProject.svg?branch=master)](https://travis-ci.org/XVQD/cs207-FinalProject.svg?branch=master)
 
