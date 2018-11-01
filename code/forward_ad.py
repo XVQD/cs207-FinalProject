@@ -91,11 +91,11 @@ class AutoDiff:
         x_new = AutoDiff(self.val, self.der)
         try:
             x_new.val = self.val ** other.val
-            x_new.der = np.array([other.val/self.val * self.val ** other.val, 
-                                  np.log(self.val) * self.val ** other.val])
+            # x_new.der = np.array([other.val/self.val * self.val ** other.val, 
+            #                       np.log(self.val) * self.val ** other.val])
             # # should it be:
-            # x_new.der = other.val * self.val ** other.val * self.der + 
-            #          np.log(self.val) * self.val ** other.val * other.der
+            x_new.der = other.val * self.val ** (other.val-1) * self.der + 
+                     np.log(self.val) * self.val ** other.val * other.der
         except AttributeError:
             x_new.der = other * x_new.val ** (other - 1)
             x_new.val = x_new.val**other
