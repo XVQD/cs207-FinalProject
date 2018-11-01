@@ -1,59 +1,40 @@
 from forward_ad import AutoDiff
 
 def exp(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.exp(x_new.val)
-    x_new.der = x_new.val * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.exp(autodiff_obj.val), 
+        np.exp(autodiff_obj.val) * autodiff_obj.der)
 
 # trigonometric functions
 def sin(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.sin(x_new.val)
-    x_new.der = np.cos(autodiff_obj.val) * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.sin(autodiff_obj.val), 
+        np.cos(autodiff_obj.val) * autodiff_obj.der)
 
 def cos(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.cos(x_new.val)
-    x_new.der = -np.sin(autodiff_obj.val) * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.cos(autodiff_obj.val), 
+        -np.sin(autodiff_obj.val) * autodiff_obj.der)
 
 # hyperbolic functions
 def sinh(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.sinh(x_new.val)
-    x_new.der = np.cosh(x_new.val) * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.sinh(autodiff_obj.val), 
+        np.cosh(autodiff_obj.val) * autodiff_obj.der)
 
 def cosh(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.cosh(x_new.val)
-    x_new.der = np.sinh(x_new.val) * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.cosh(autodiff_obj.val), 
+        np.sinh(autodiff_obj.val) * autodiff_obj.der)
 
 def tanh(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.tanh(x_new.val)
-    x_new.der = (1-np.tanh(x_new.val)**2) * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.tanh(autodiff_obj.val), 
+        (1-np.tanh(autodiff_obj.val)**2) * autodiff_obj.der)
 
 # Inverse trigonometric functions
 def arcsin(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.arcsin(x_new.val)
-    x_new.der = (1-(x_new.val)**2)**(-0.5) * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.arcsin(autodiff_obj.val), 
+        (1-(autodiff_obj.val)**2)**(-0.5) * autodiff_obj.der)
 
 def arccos(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.arccos(x_new.val)
-    x_new.der = -(1-(x_new.val)**2)**(-0.5) * autodiff_obj.der
-    return x_new
+    return AutoDiff(np.arccos(autodiff_obj.val), 
+        -(1-(autodiff_obj.val)**2)**(-0.5) * autodiff_obj.der)
 
 def arctan(autodiff_obj):
-    x_new = AutoDiff(autodiff_obj.val, autodiff_obj.der)
-    x_new.val = np.arctan(x_new.val)
-    x_new.der = 1/(1+(x_new.val)**2) * autodiff_obj.der
-    return x_new
-
+    return AutoDiff(np.arctan(x_new.val), 
+        1/(1+(autodiff_obj.val)**2) * autodiff_obj.der)
