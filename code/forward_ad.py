@@ -20,7 +20,7 @@ class AutoDiff:
     >>> x3 = AutoDiff(7,  name='x3')
     >>> x4 =  x2 * x3
     >>> print(x4.val, v4.der)  # only calculate derivatives of registered(i.e.named) independent variables 
-    14 {'x1': 7, 'x2': 2} 
+    14 {'x1': 7, 'x3': 2} 
     """
 
     def __init__(self, input_val, init_der):
