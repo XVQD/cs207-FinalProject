@@ -15,15 +15,12 @@ class AutoDiff:
     
     Examples
     ========
-    >>> a = 2
-    >>> b = 3
-    >>> c = 4
-    >>> x1 = AutoDiff(a, np.array([1, 0, 0]))
-    >>> x2 = AutoDiff(b, np.array([0, 1, 0]))
-    >>> x3 = AutoDiff(c, np.array([0, 0, 1]))
-    >>> x3 = x1 + x2 + x3
-    >>> x3.val, x3.der
-    (9, array([1, 1, 1]))
+    >>> x1 = AutoDiff(1, name='x1') # register independent variables by specifying names
+    >>> x2 = x1 + 1
+    >>> x3 = AutoDiff(7,  name='x3')
+    >>> x4 =  x2 * x3
+    >>> print(x4.val, v4.der)  # only calculate derivatives of registered(i.e.named) independent variables 
+    14 {'x1': 7, 'x2': 2} 
     """
 
     def __init__(self, input_val, init_der):
