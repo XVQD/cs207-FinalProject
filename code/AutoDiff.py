@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 
 class Variable:
@@ -18,33 +19,37 @@ class Variable:
     >>> from Autodiff import Variable
     >>> x1 = Variable(1, name='x1') # register independent variables by specifying names
     >>> x2 = x1 + 1
-    >>> x3 = Variable(7,  name='x3')
+    >>> x3 = Variable(7, 'x3')
     >>> x4 =  x2 * x3
     >>> print(x4.val, v4.der)  # only calculate derivatives of registered(i.e.named) independent variables 
     14 {'x1': 7, 'x3': 2} 
     """
 
-    def __init__(self, input_val, init_der):
-        self.val = input_val
-        self.der = init_der
+    def __init__(self, val, name=None , der=None):
+        self.val = val
+        if name!= None:
+            self.der = {name:1}
+        else:
+            self.der=der
 
     def __add__(self, other):
         try:
-            x_new = AutoDiff(self.val, self.der)
-            x_new.val += other.val
-            x_new.der += other.der
+            a=self.der
+            b=other.der
+            der={x: a.get(x, 0) + b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
+            return Variable(self.val+other.val, der=der)
         except AttributeError:
-            x_new.val += other
-        return x_new
-        
+            return Variable(self.val+other, der=self.der)
+
     def __radd__(self, other):
         try:
-            x_new = AutoDiff(self.val, self.der)
-            x_new.val += other.val
-            x_new.der += other.der
+            a=self.der
+            b=other.der
+            der={x: a.get(x, 0) + b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
+            return Variable(self.val+other.val, der=der)
         except AttributeError:
-            x_new.val += other
-        return x_new
+            return Variable(self.val+other, der=self.der)
+
     
     def __sub__(self, other):
         try:
@@ -92,10 +97,23 @@ class Variable:
             # x_new.der = np.array([other.val/self.val * self.val ** other.val, 
             #                       np.log(self.val) * self.val ** other.val])
             # # should it be:
-            x_new.der = other.val * self.val ** (other.val-1) * self.der + 
+            x_new.der = other.val * self.val ** (other.val-1) * self.der + \
                      np.log(self.val) * self.val ** other.val * other.der
         except AttributeError:
             x_new.der = other * x_new.val ** (other - 1)
             x_new.val = x_new.val**other
  
         return x_new
+
+if __name__=="__main__":
+    x1 = Variable(1, name='x1') # register independent variables by specifying names
+    print(x1.val, x1.der) 
+    x2 = x1 + 1
+    print(x2.val, x2.der) 
+    x3 = Variable(7, 'x3')
+    x4 = x2+x3
+    print(x4.val, x4.der) 
+###### output #####
+#1 {'x1': 1}
+#2 {'x1': 1}
+#9 {'x1': 1, 'x3': 1}
