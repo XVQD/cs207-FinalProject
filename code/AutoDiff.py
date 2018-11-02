@@ -52,60 +52,21 @@ class Variable:
 
     
     def __sub__(self, other):
-        try:
-            x_new = AutoDiff(self.val, self.der)
-            x_new.val -= other.val
-            x_new.der -= other.der
-        except AttributeError:
-            x_new.val -= other
-        return x_new
-    
+        raise NotImplemented 
     def __rsub__(self, other):
-        try:
-            x_new = AutoDiff(self.val, self.der)
-            x_new.val -= other.val
-            x_new.der -= other.der
-        except AttributeError:
-            x_new.val -= other
-        return x_new
-        
+        raise NotImplemented 
     def __mul__(self, other):
-        try:
-            x_new = AutoDiff(self.val, self.der)
-            x_new.val *= other.val
-            x_new.der = other.val
-        except AttributeError:
-            x_new.val *= other
-        return x_new
-        
+        raise NotImplemented         
     def __rmul__(self, other):
-        try:
-            x_new = AutoDiff(self.val, self.der)
-            x_new.val *= other.val
-            x_new.der = other.val
-        except AttributeError:
-            x_new.val *= other
-        return x_new
-        
-    def __truediv(self, other):
-        pass
-
+        raise NotImplemented 
     def __pow__(self, other):
-        x_new = AutoDiff(self.val, self.der)
-        try:
-            x_new.val = self.val ** other.val
-            # x_new.der = np.array([other.val/self.val * self.val ** other.val, 
-            #                       np.log(self.val) * self.val ** other.val])
-            # # should it be:
-            x_new.der = other.val * self.val ** (other.val-1) * self.der + \
-                     np.log(self.val) * self.val ** other.val * other.der
-        except AttributeError:
-            x_new.der = other * x_new.val ** (other - 1)
-            x_new.val = x_new.val**other
- 
-        return x_new
+        raise NotImplemented 
+    def __rpow__(self,other):
+        raise NotImplemented 
+#y ** x and pow( y,x ) call x .__rpow__( y ), when y doesn’t have __pow__. There is no three-argument form in this case.
 
 if __name__=="__main__":
+    #test
     x1 = Variable(1, name='x1') # register independent variables by specifying names
     print(x1.val, x1.der) 
     x2 = x1 + 1
