@@ -42,28 +42,82 @@ class Variable:
             return Variable(self.val+other, der=self.der)
 
     def __radd__(self, other):
+        # other is an constant otherwise other.__add__ is implemented
+        return Variable(self.val+other, der=self.der)
+   
+    def __sub__(self, other):
         try:
             a=self.der
             b=other.der
-            der={x: a.get(x, 0) + b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
-            return Variable(self.val+other.val, der=der)
+            der={x: a.get(x, 0) - b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
+            return Variable(self.val-other.val, der=der)
         except AttributeError:
-            return Variable(self.val+other, der=self.der)
+            return Variable(self.val-other, der=self.der)
 
-    
-    def __sub__(self, other):
-        raise NotImplemented 
     def __rsub__(self, other):
-        raise NotImplemented 
+        # other is an constant otherwise other.__sub__ is implemented
+        return Variable(other-self.val, der=self.der)
+
     def __mul__(self, other):
-        raise NotImplemented         
+        try:
+            a=self.der
+            b=other.der
+            der={x: other.val * a.get(x, 0) + self.val * b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
+            return Variable(self.val * other.val, der=der)
+        except AttributeError:
+            return Variable(self.val * other, der=self.der * other)
+
     def __rmul__(self, other):
-        raise NotImplemented 
+        # other is an constant otherwise other.__mul__ is implemented
+        return Variable(self.val * other, der=self.der * other)
+
     def __pow__(self, other):
-        raise NotImplemented 
+        try:
+            a=self.der
+            b=other.der
+            der={x: other.val * self.val ** (other.val-1) * a.get(x, 0) 
+                + np.log(self.val) * self.val ** other.val * b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
+            return Variable(self.val ** other.val, der=der)
+        except AttributeError:
+            return Variable(self.val ** other, der=other*self.val**(other-1) * self.der)
+
     def __rpow__(self,other):
-        raise NotImplemented 
+        # other is an constant otherwise other.__pow__ is implemented
+        return Variable(other**self.val, der=np.log(other) * other ** self.val * self.der)
 #y ** x and pow( y,x ) call x .__rpow__( y ), when y doesn’t have __pow__. There is no three-argument form in this case.
+
+# elementary functions
+
+def exp(obj):
+    return Variable(np.exp(obj.val), np.exp(obj.val) * obj.der)
+
+# trigonometric functions
+def sin(obj):
+    return Variable(np.sin(obj.val), np.cos(obj.val) * obj.der)
+
+def cos(obj):
+    return Variable(np.cos(obj.val), -np.sin(obj.val) * obj.der)
+
+# hyperbolic functions
+def sinh(obj):
+    return Variable(np.sinh(obj.val), np.cosh(obj.val) * obj.der)
+
+def cosh(obj):
+    return Variable(np.cosh(obj.val), np.sinh(obj.val) * obj.der)
+
+def tanh(obj):
+    return Variable(np.tanh(obj.val), (1-np.tanh(obj.val)**2) * obj.der)
+
+# Inverse trigonometric functions
+def arcsin(obj):
+    return Variable(np.arcsin(obj.val), (1-(obj.val)**2)**(-0.5) * obj.der)
+
+def arccos(obj):
+    return Variable(np.arccos(obj.val), -(1-(obj.val)**2)**(-0.5) * obj.der)
+
+def arctan(obj):
+    return Variable(np.arctan(x_new.val), 1/(1+(obj.val)**2) * obj.der)
+
 
 if __name__=="__main__":
     #test
