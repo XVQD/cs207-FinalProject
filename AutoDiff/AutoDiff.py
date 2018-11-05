@@ -84,12 +84,12 @@ class Variable:
         der={x: other * a.get(x, 0) for x in set(a)}
         return Variable(self.val * other, der=der)
 
-    def __itruediv__(self, other):
+    def __truediv__(self, other):
         a=self.der
-        try:           
+        try:          
             b=other.der
             der={x: 1/other.val * a.get(x, 0) - self.val/other.val**2 * b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
-            return Variable(self.val * other.val, der=der)
+            return Variable(self.val / other.val, der=der)
         except AttributeError:
             der={x: a.get(x, 0) / other for x in set(a)} 
             return Variable(self.val / other, der=der)
@@ -113,6 +113,7 @@ class Variable:
 
     def __rpow__(self,other):
         # other is an constant otherwise other.__pow__ is implemented
+        a=self.der
         der={x: np.log(other) * other ** self.val * a.get(x, 0) for x in set(a)} 
         return Variable(other**self.val, der= der)
 #y ** x and pow( y,x ) call x .__rpow__( y ), when y doesn’t have __pow__. There is no three-argument form in this case.
@@ -158,7 +159,6 @@ def sinh(obj):
     return Variable(val, der = der)
 
 def cosh(obj):
-    return Variable(np.cosh(obj.val), np.sinh(obj.val) * obj.der)
     a = obj.der
     der = {x: np.sinh(obj.val) * a.get(x, 0) for x in set(a)}
     val = np.cosh(obj.val)
@@ -189,15 +189,15 @@ def arctan(obj):
     val = np.arctan(obj.val)
     return Variable(val, der = der)
 
-if __name__=="__main__":
-    #test
-    x1 = Variable(1, name='x1') # register independent variables by specifying names
-    print(x1.val, x1.der) 
-    x2 = x1 + 1
-    print(x2.val, x2.der) 
-    x3 = Variable(7, 'x3')
-    x4 = x2+x3
-    print(x4.val, x4.der) 
+# if __name__=="__main__":
+#     #test
+#     x1 = Variable(1, name='x1') # register independent variables by specifying names
+#     print(x1.val, x1.der) 
+#     x2 = x1 + 1
+#     print(x2.val, x2.der) 
+#     x3 = Variable(7, 'x3')
+#     x4 = x2+x3
+#     print(x4.val, x4.der) 
 ###### output #####
 #1 {'x1': 1}
 #2 {'x1': 1}
