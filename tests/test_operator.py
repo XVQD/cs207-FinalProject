@@ -28,3 +28,10 @@ class Test_Operator():
         assert x4.der == {'x1': -1, 'x2': 1}
         assert x5.val == 0
         assert x5.der == {'x1': -1}
+
+    def test_mul(self):
+        x1 = Variable(4, name='x1')
+        x2 = Variable(1, name='x2')
+        x3 = 3*x1*x2*3
+        assert x3.val == 36
+        assert x3.der == {'x1': 9, 'x2': 36}
