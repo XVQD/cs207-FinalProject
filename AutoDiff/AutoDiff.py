@@ -198,7 +198,7 @@ def arctan(obj):
 #     x3 = Variable(7, 'x3')
 #     x4 = x2+x3
 #     print(x4.val, x4.der) 
-###### output #####
+###### output ######
 #1 {'x1': 1}
 #2 {'x1': 1}
 #9 {'x1': 1, 'x3': 1}
