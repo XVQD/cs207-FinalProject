@@ -42,12 +42,12 @@ class Variable:
 
     def __init__(self, val, name=None , der=None, der2=None):
         """Initializes Variable with a value and a derivative."""
-        self.val = val
+        self.val = np.array(val)
         
         # if a name is supplied, then create a new variable with its own derivative
         if name!= None:
-            self.der = {name:1} # the first derivative of a variable is 1
-            self.der2 = {name:0} # the first derivative of a variable is 0
+            self.der = {name: np.ones(len(self.val))} # the first derivative of a variable is 1
+            self.der2 = {name: np.zeros(len(self.val))} # the first derivative of a variable is 0
         else:
             self.der = der
             self.der2 = der2
