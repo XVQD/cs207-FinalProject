@@ -43,15 +43,19 @@ class Variable:
     def __init__(self, val, name=None , der=None, der2=None):
         """Initializes Variable with a value and a derivative."""
         self.val = val
-        
+        self.name=name
         # if a name is supplied, then create a new variable with its own derivative
         if name!= None:
             self.der = {name:1} # the first derivative of a variable is 1
             self.der2 = {name:0} # the first derivative of a variable is 0
         else:
-            self.der = der
-            self.der2 = der2
-
+            self.der = None
+            self.der2 = None
+    def __str__(self):
+        if self.name==None:
+            return "ad.Variable(val={})".format(self.val )
+        else:
+            return "ad.Variable(val={},name={},der={},der2={})".format(self.val,self.name,self.der,self.der2 )
     def __pos__(self):
         """Returns the Variable itself. Does nothing to value or derivative."""
         return Variable(self.val, der=self.der, der2=self.der2)
