@@ -42,20 +42,25 @@ class Variable:
 
     def __init__(self, val, name=None , der=None, der2=None):
         """Initializes Variable with a value and a derivative."""
-        self.val = val
+
         self.name=name
+        self.val = np.array(val)
+        try:
+            lenn=len(self.val)
+        except:
+            lenn=1
         # if a name is supplied, then create a new variable with its own derivative
         if name!= None:
-            self.der = {name:1} # the first derivative of a variable is 1
-            self.der2 = {name:0} # the first derivative of a variable is 0
+            self.der = {name: np.ones(lenn)} # the first derivative of a variable is 1
+            self.der2 = {name: np.zeros(lenn)} # the first derivative of a variable is 0
         else:
-            self.der = None
-            self.der2 = None
+            self.der = der
+            self.der2 = der2
     def __str__(self):
-        if self.name==None:
-            return "ad.Variable(val={})".format(self.val )
-        else:
-            return "ad.Variable(val={},name={},der={},der2={})".format(self.val,self.name,self.der,self.der2 )
+#         if self.name==None:
+#             return "ad.Variable(val={})".format(self.val )
+#         else:
+        return "ad.Variable(val={},name='{}',der={},der2={})".format(self.val,self.name,self.der,self.der2 )
     def __pos__(self):
         """Returns the Variable itself. Does nothing to value or derivative."""
         return Variable(self.val, der=self.der, der2=self.der2)
@@ -302,16 +307,3 @@ def arctan(obj):
     val = np.arctan(obj.val)
     return Variable(val, der = der, der2 = der2)
 
-# if __name__=="__main__":
-#     #test
-#     x1 = Variable(1, name='x1') # register independent variables by specifying names
-#     print(x1.val, x1.der) 
-#     x2 = x1 + 1
-#     print(x2.val, x2.der) 
-#     x3 = Variable(7, 'x3')
-#     x4 = x2+x3
-#     print(x4.val, x4.der) 
-###### output ######
-#1 {'x1': 1}
-#2 {'x1': 1}
-#9 {'x1': 1, 'x3': 1}
