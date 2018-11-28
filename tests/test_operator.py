@@ -65,3 +65,8 @@ class Test_Operator():
         assert x4.der == {'x1': 27}  
         assert x5.val == 27
         assert x5.der == {'x1': np.log(3)*3**3}
+
+    def test_print(self):
+        x1 = Variable(3, name='x1')
+        print(x1)
+        assert  1 == 1

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import copy
 
 class Variable:
     """A Variable class which contains the variable's value and derivatives and has
@@ -44,7 +45,7 @@ class Variable:
         """Initializes Variable with a value and a derivative."""
 
         self.name=name
-        self.val = np.array(val)
+        self.val = np.array(val).astype(float)
         try:
             lenn=len(self.val)
         except:
@@ -52,7 +53,7 @@ class Variable:
         # if a name is supplied, then create a new variable with its own derivative
         if name!= None:
             self.der = {name: np.ones(lenn)} # the first derivative of a variable is 1
-            self.der2 = {name: np.zeros(lenn)} # the first derivative of a variable is 0
+            self.der2 = {name+name: np.zeros(lenn)} # the first derivative of a variable is 0
         else:
             self.der = der
             self.der2 = der2
@@ -68,23 +69,25 @@ class Variable:
     def __neg__(self):
         """Returns a Variable with negated value and derivative."""
         # first order
-        a=self.der
+        a=copy.deepcopy(self.der)
+        a2=copy.deepcopy(self.der2)
         der={x: -a.get(x, 0) for x in set(a)}
         # second order
-        a2 = self.der2
         der2={x: -a2.get(x, 0) for x in set(a2)}
         return Variable(-self.val, der=der, der2 = der2)
 
     def __add__(self, other):
         """Returns a Variable that adds a Variable with another Variable, or with a constant."""
         try:
-            a=self.der
-            b=other.der
-            a2=self.der2
-            b2=other.der2
+            a=copy.deepcopy(self.der)
+            a2=copy.deepcopy(self.der2)
+            b=copy.deepcopy(other.der)
+            b2=copy.deepcopy(other.der2)
             # combine derivative dictionaries by adding them
             der={x: a.get(x, 0) + b.get(x, 0) for x in set(a).union(b)}
+            a2,b2 = self._expand(a,b,a2,b2)
             der2={x: a2.get(x, 0) + b2.get(x, 0) for x in set(a2).union(b2)}
+            print(der2)
             return Variable(self.val+other.val, der=der, der2 = der2)
         # other is not a Variable
         except AttributeError:
@@ -98,12 +101,13 @@ class Variable:
     def __sub__(self, other):
         """Returns a Variable that subtracts a Variable from another Variable, or with a constant."""
         try:
-            a=self.der
-            b=other.der
-            a2=self.der2
-            b2=other.der2
+            a=copy.deepcopy(self.der)
+            a2=copy.deepcopy(self.der2)
+            b=copy.deepcopy(other.der)
+            b2=copy.deepcopy(other.der2)
             # combine derivative dictionaries by subtracting corresponding values
             der={x: a.get(x, 0) - b.get(x, 0) for x in set(a).union(b)}
+            a2,b2 = self._expand(a,b,a2,b2)
             der2={x: a2.get(x, 0) - b2.get(x, 0) for x in set(a2).union(b2)}
             return Variable(self.val-other.val, der=der, der2 = der2)
         # other is not a Variable
@@ -113,23 +117,27 @@ class Variable:
     def __rsub__(self, other):
         """Returns a Variable that subtracts a constant from a Variable."""
         # other is an constant otherwise other.__sub__ is implemented
-        a=self.der
-        a2 = self.der2
+        a=copy.deepcopy(self.der)
+        a2=copy.deepcopy(self.der2)
         der={x: -a.get(x, 0) for x in set(a)}
         der2={x: -a2.get(x, 0) for x in set(a2)}
         return Variable(other-self.val, der=der, der2 = der2)
 
     def __mul__(self, other):
         """Returns a Variable that mulitplies a Variable with another Variable, or with a constant."""
-        a=self.der
-        a2=self.der2
+        a=copy.deepcopy(self.der)
+        a2=copy.deepcopy(self.der2)
         try:
-            b=other.der
-            b2=other.der2
+            b=copy.deepcopy(other.der)
+            b2=copy.deepcopy(other.der2)
             # combine derivative dictionaries by multiplying one variable's value with the other's derivatives
             der={x: other.val * a.get(x, 0) + self.val * b.get(x, 0) for x in set(a).union(b)} 
-            der2 = {x: other.val * a2.get(x, 0) + self.val * b2.get(x, 0)
-                    + 2*a.get(x,0)*b.get(x,0) for x in set(a).union(b)}
+            a2, b2 = self._expand(a, b, a2, b2)
+            der2 = {}
+            for x in set(a).union(b):
+                for y in set(a).union(b):
+                    der2[x+y] = (other.val * a2.get(x+y,0) + self.val * b2.get(x+y,0) 
+                            + a.get(x,0)*b.get(y,0) + a.get(y,0)*b.get(x,0))
             return Variable(self.val * other.val, der=der, der2 = der2)
         # other is not a Variable
         except AttributeError:
@@ -148,15 +156,20 @@ class Variable:
 
     def __truediv__(self, other):
         """Returns a Variable that divides a Variable from another Variable, or with a constant."""
-        a=self.der
-        a2 = self.der2
-        try:          
-            b=other.der
-            b2 = other.der2
+        a=copy.deepcopy(self.der)
+        a2=copy.deepcopy(self.der2)
+        try:
+            b=copy.deepcopy(other.der)
+            b2=copy.deepcopy(other.der2)
             der={x: 1/other.val * a.get(x, 0) - self.val/other.val**2 * b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
-            der2={x: 1/other.val * a2.get(x, 0) - self.val/other.val**2 * b2.get(x, 0) 
-                    -2*a.get(x,0)*b.get(x,0)/other.val**2 + 2*self.val/other.val**3*b.get(x,0)**2 
-                    for x in set(a2).union(b2)}
+            a2,b2 = self._expand(a,b,a2,b2)
+            der2 = {}
+            for x in set(a).union(b):
+                for y in set(a).union(b):
+                    der2[x+y] = (1/other.val*a2.get(x+y,0) - self.val/other.val**2*b2.get(x+y,0) 
+                            +2*self.val/other.val**3*b.get(x,0)*b.get(y,0)
+                            -1/other.val**2*a.get(x,0)*b.get(y,0)
+                            -1/other.val**2*a.get(y,0)*b.get(x,0))
             return Variable(self.val / other.val, der=der, der2 = der2)
         except AttributeError:
             der={x: a.get(x, 0) / other for x in set(a)} 
@@ -166,41 +179,69 @@ class Variable:
     def __rtruediv__(self, other):
         """Returns a Variable that divides a constant from a Variable."""
         # other is an constant otherwise other.__itruediv__ is implemented
-        a=self.der
-        a2 = self.der2
+        a=copy.deepcopy(self.der)
+        a2=copy.deepcopy(self.der2)
         der={x: -other/self.val**2 * a.get(x, 0) for x in set(a)} 
-        der2={x: -other/self.val**2 * a2.get(x, 0) + 2*other/self.val**3*a.get(x,0)**2 for x in set(a2)} 
+        der2 = {}
+        for x in set(a):
+            for y in set(a):
+                der2[x+y] = -other/self.val**2 * a2.get(x+y,0) + 2*other/self.val**3*a.get(x,0)*a.get(y,0)
         return Variable(other/self.val, der= der, der2 = der2)
 
     def __pow__(self, other):
         """Returns a Variable that raises a Variable to another Variable, or with a constant."""
-        a=self.der
-        a2 = self.der2
+        a=copy.deepcopy(self.der)
+        a2=copy.deepcopy(self.der2)
         try:
-            b=other.der
-            b2 = other.der2
+            b=copy.deepcopy(other.der)
+            b2=copy.deepcopy(other.der2)
             der={x: other.val * self.val ** (other.val-1) * a.get(x, 0) 
                 + np.log(self.val) * self.val ** other.val * b.get(x, 0) for x in set(a).union(b)} #combine dictionaries and do arithmatics
-            der2={x: other.val * self.val ** (other.val-1) * a2.get(x, 0) 
-                + np.log(self.val) * self.val ** other.val * b2.get(x, 0)
-                + self.val ** other.val*(2*a.get(x,0)*b.get(x,0)/self.val
-                - other.val/self.val**2*a.get(x,0)**2)+self.val ** other.val*(other.val*a.get(x,0)/self.val
-                +np.log(self.val)*b.get(x,0))**2 for x in set(a2).union(b2)}
+            a2,b2 = self._expand(a,b,a2,b2)
+            der2 = {}
+            for x in set(a).union(b):
+                for y in set(a).union(b):
+                    der2[x+y] = (other.val * self.val ** (other.val-1) * a2.get(x+y, 0) 
+                        + np.log(self.val) * self.val ** other.val * b2.get(x+y, 0)
+                        + a.get(x,0)*a.get(y,0)*(self.val**(other.val-2)*(other.val**2-other.val))
+                        + a.get(x,0)*b.get(y,0)*(self.val**(other.val-1)+np.log(self.val)*self.val**(other.val-1)*other.val)
+                        + a.get(y,0)*b.get(x,0)*(self.val**(other.val-1)+np.log(self.val)*self.val**(other.val-1)*other.val)
+                        + (np.log(self.val))**2*self.val**other.val*b.get(x,0)*b.get(y,0))
             return Variable(self.val ** other.val, der=der, der2 = der2)
         except AttributeError:
             der={x: other*self.val**(other-1) * a.get(x, 0) for x in set(a)} 
-            der2={x: other*self.val**(other-2)*((other-1)*a.get(x, 0)**2 + self.val*a2.get(x, 0)) for x in set(a2)} 
+            der2 = {}
+            for x in set(a):
+                for y in set(a):
+                    der2[x+y] = other*self.val**(other-2)*((other-1)*a.get(x, 0)*a.get(y,0) + self.val*a2.get(x+y, 0))
             return Variable(self.val ** other, der= der, der2 = der2)
 
     def __rpow__(self,other):
         """Returns a Variable that raises a constant to a Variable."""
         # other is an constant otherwise other.__pow__ is implemented
-        a=self.der
-        a2 = self.der2
+        a=copy.deepcopy(self.der)
+        a2=copy.deepcopy(self.der2)
         der={x: np.log(other) * other ** self.val * a.get(x, 0) for x in set(a)} 
-        der2={x: other**self.val*np.log(other)*(np.log(other)*a.get(x, 0)**2+a2.get(x, 0)) for x in set(a2)} 
+        der2 = {}
+        for x in set(a):
+            for y in set(a):
+                der2[x+y] = other**self.val*np.log(other)*(np.log(other)*a.get(x, 0)*a.get(y,0)+a2.get(x+y, 0))
         return Variable(other**self.val, der= der, der2 = der2)
 #y ** x and pow( y,x ) call x .__rpow__( y ), when y doesn’t have __pow__. There is no three-argument form in this case.
+
+    def _expand(self,a,b,a2,b2):
+        for x in set(a).union(b):
+            for y in set(a).union(b):
+                try:
+                    temp = a2[x+y]
+                except KeyError:
+                    a2[x+y] = np.array([0.0])
+                try:
+                    temp = b2[x+y]
+                except KeyError:
+                    b2[x+y] = np.array([0.0])
+        return a2, b2
+
 
 # ELEMENTARY FUNCTIONS
 
@@ -210,6 +251,10 @@ def exp(obj):
     a2 = obj.der2
     der = {x: np.exp(obj.val) * a.get(x, 0) for x in set(a)}
     der2 = {x: np.exp(obj.val) * (a.get(x, 0)**2+a2.get(x,0)) for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = np.exp(obj.val)*(a.get(x, 0)*a.get(y, 0)+a2.get(x+y,0))
     val = np.exp(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -218,7 +263,10 @@ def log(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: 1/obj.val * a.get(x, 0) for x in set(a)}
-    der2 = {x: (-a.get(x, 0)**2+obj.val*a2.get(x, 0))/obj.val**2 for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = (-a.get(x, 0)*a.get(y, 0)+obj.val*a2.get(x, 0))/obj.val**2
     val = np.log(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -228,7 +276,10 @@ def sin(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: np.cos(obj.val) * a.get(x, 0) for x in set(a)}
-    der2 = {x: np.cos(obj.val)*a2.get(x, 0) - np.sin(obj.val)*a.get(x,0)**2 for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = np.cos(obj.val)*a2.get(x+y, 0)-np.sin(obj.val)*a.get(x,0)*a.get(y,0)
     val = np.sin(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -237,7 +288,10 @@ def cos(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: -np.sin(obj.val) * a.get(x, 0) for x in set(a)}
-    der2 = {x: -np.sin(obj.val)*a2.get(x, 0) - np.cos(obj.val)*a.get(x,0)**2 for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = -np.sin(obj.val)*a2.get(x, 0) - np.cos(obj.val)*a.get(x,0)*a.get(y,0)
     val = np.cos(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -246,7 +300,10 @@ def tan(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: (1+np.tan(obj.val)**2) * a.get(x, 0) for x in set(a)}
-    der2 = {x: (1+np.tan(obj.val)**2)*(a2.get(x, 0)+2*np.tan(obj.val)*a.get(x, 0)**2) for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = (1+np.tan(obj.val)**2)*(a2.get(x, 0)+2*np.tan(obj.val)*a.get(x,0)*a.get(y,0))
     val = np.tan(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -256,7 +313,10 @@ def sinh(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: np.cosh(obj.val) * a.get(x, 0) for x in set(a)}
-    der2 = {x: np.cosh(obj.val)*a2.get(x, 0) + np.sinh(obj.val)*a.get(x, 0)**2 for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = np.cosh(obj.val)*a2.get(x, 0) + np.sinh(obj.val)*a.get(x, 0)*a.get(y,0)
     val = np.sinh(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -265,7 +325,10 @@ def cosh(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: np.sinh(obj.val) * a.get(x, 0) for x in set(a)}
-    der2 = {x: np.sinh(obj.val)*a2.get(x, 0) + np.cosh(obj.val)*a.get(x, 0)**2 for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = np.sinh(obj.val)*a2.get(x, 0) + np.cosh(obj.val)*a.get(x, 0)*a.get(y,0)
     val = np.cosh(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -274,7 +337,10 @@ def tanh(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: (1-np.tanh(obj.val)**2) * a.get(x, 0) for x in set(a)}
-    der2 = {x: (1-np.tanh(obj.val)**2)*(a2.get(x, 0)-2*np.tanh(obj.val)*a.get(x, 0)**2) for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = (1-np.tanh(obj.val)**2)*(a2.get(x, 0)-2*np.tanh(obj.val)*a.get(x, 0)*a.get(y,0))
     val = np.tanh(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -284,7 +350,10 @@ def arcsin(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: (1-(obj.val)**2)**(-0.5) * a.get(x, 0) for x in set(a)}
-    der2 = {x: (1-(obj.val)**2)**(-1.5)*(obj.val*a.get(x, 0)**2-(obj.val**2-1)*a2.get(x, 0)) for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = (1-(obj.val)**2)**(-1.5)*(obj.val*a.get(x, 0)*a.get(y,0)-(obj.val**2-1)*a2.get(x, 0))
     val = np.arcsin(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -293,8 +362,10 @@ def arccos(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: -(1-(obj.val)**2)**(-0.5) * a.get(x, 0) for x in set(a)}
-    der2 = {x: -(1-(obj.val)**2)**(-1.5)*(obj.val*a.get(x, 0)**2+a2.get(x, 0)-obj.val**2*a2.get(x, 0))
-            for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = -(1-(obj.val)**2)**(-1.5)*(obj.val*a.get(x, 0)*a.get(y,0)+a2.get(x, 0)-obj.val**2*a2.get(x, 0))
     val = np.arccos(obj.val)
     return Variable(val, der = der, der2 = der2)
 
@@ -303,7 +374,10 @@ def arctan(obj):
     a = obj.der
     a2 = obj.der2
     der = {x: 1/(1+(obj.val)**2) * a.get(x, 0) for x in set(a)}
-    der2 = {x: (1+(obj.val)**2)**(-2)*(-2*obj.val*a.get(x, 0)**2+(obj.val**2+1)*a2.get(x, 0)) for x in set(a2)}
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = (1+(obj.val)**2)**(-2)*(-2*obj.val*a.get(x, 0)*a.get(y,0)+(obj.val**2+1)*a2.get(x, 0))
     val = np.arctan(obj.val)
     return Variable(val, der = der, der2 = der2)
 
