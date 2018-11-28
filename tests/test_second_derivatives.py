@@ -108,4 +108,4 @@ class Test_second_derivatives():
         assert z1.der2['x1x1'][0] == 0.71383219164197809
         assert z1.der2['x1x2'][0] == -1.4433756729740643
         assert z1.der2['x2x1'][0] == -1.4433756729740643
-        assert z1.der2['x2x2'][0] == -1.2623812424898966     
+        assert z1.der2['x2x2'][0] == -1.262381242489897    
