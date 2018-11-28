@@ -84,7 +84,7 @@ class Test_second_derivatives():
         assert z1.der2['x1x1'][0] == -0.45464871341284091
         assert z1.der2['x1x2'][0] == -0.45464871341284091
         assert z1.der2['x2x1'][0] == -0.45464871341284091
-        assert z1.der2['x2x2'][0] == 10.215210231562473
+        assert z1.der2['x2x2'][0] == 10.215210231562478
 
     def test_hyperbolics(self):
         x1 = Variable(1, name='x1')
