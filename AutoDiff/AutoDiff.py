@@ -61,7 +61,7 @@ class Variable:
 #         if self.name==None:
 #             return "ad.Variable(val={})".format(self.val )
 #         else:
-        return "ad.Variable(val={},name='{}',der={},der2={})".format(self.val,self.name,self.der,self.der2 )
+        return "ad.Variable(val={},\n name='{}', \n der={}, \n der2={})".format(self.val,self.name,self.der,self.der2 )
     def __pos__(self):
         """Returns the Variable itself. Does nothing to value or derivative."""
         return Variable(self.val, der=self.der, der2=self.der2)
