@@ -1,8 +1,26 @@
 from AutoDiff.AutoDiff import Variable
-from AutoDiff.gmres import A, b, grad, gmres_autodiff
+from AutoDiff.gmres import grad, gmres_autodiff
 import numpy as np
 from scipy.sparse.linalg import gmres, LinearOperator
 import sympy as sym
+
+# GMRES
+# define variables and do AD
+x1 = Variable(1, name='x1')
+x2 = Variable(1, name='x2')
+x3 = Variable(1, name='x3')
+f1 = 2*x1+3*x2+2*x3
+f2 = 3*x1+2*x2+1*x3
+f3 = 3*x1+3*x2+3*x3
+F = [f1, f2, f3]
+b = np.array([1, 2, 3])
+
+# define action on x
+action = LinearOperator((3, 3), matvec=grad)
+
+# GMRES to get x
+x, exitcode = gmres(action, b)
+print(x)
 
 # function to construct Jacobian matrix
 def Jacobian(v_str, f_list):
@@ -13,10 +31,6 @@ def Jacobian(v_str, f_list):
         for j, s in enumerate(vars):
             J[i,j] = sym.diff(fi, s)
     return J
-
-# function to get matrix-vector product
-def action_func(x):
-    return np.dot(A, x)
 
 # time the Jacobian matrix construction for matrices of different sizes
 times_jacobian = []
@@ -34,18 +48,5 @@ for size_n in range(10, 110, 10):
     Jacobian(var, f)
     end = time.time()
     times_jacobian.append(end-start)
-    
-# time the GMRES solving times
-times_gmres = []
-for i in range(10, 110, 10):
-    # GMRES to solve Ax=b
-    A = np.random.rand(i, i)
-    b = np.random.rand(i)
-    action = LinearOperator((i, i), matvec=action_func)
-    start = time.time()
-    x, exitcode = gmres(action, b)
-    end = time.time()
-    times_gmres.append(end-start)
-    
-print('Jacobian times', times_jacobian)
-print('GMRES times', times_gmres)
+
+print('Jacobian time', times_jacobian)
