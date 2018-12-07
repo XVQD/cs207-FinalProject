@@ -35,7 +35,7 @@ class Variable:
     >>> from AutoDiff import Variable
     >>> x1 = Variable(1, name='x1') # register independent variables by specifying names
     >>> x2 = x1 + 1
-    >>> x3 = Variable(7, 'x3')
+    >>> x3 = Variable(7, name='x3')
     >>> x4 =  x2 * x3
     >>> print(x4.val, x4.der)  # only calculate derivatives of registered(i.e.named) independent variables 
     14 {'x1': 7, 'x3': 2} 
@@ -52,15 +52,17 @@ class Variable:
         # if a name is supplied, then create a new variable with its own derivative
         if name!= None:
             self.der = {name: np.ones(lenn)} # the first derivative of a variable is 1
-            self.der2 = {name+name: np.zeros(lenn)} # the first derivative of a variable is 0
+            self.der2 = {name+name: np.zeros(lenn)} # the second derivative of a variable is 0
         else:
             self.der = der
             self.der2 = der2
+
     def __str__(self):
-#         if self.name==None:
-#             return "ad.Variable(val={})".format(self.val )
-#         else:
-        return "ad.Variable(val={},\n name='{}', \n der={}, \n der2={})".format(self.val,self.name,self.der,self.der2 )
+        if self.name==None:
+            return "ad.Variable(val={})".format(self.val )
+        else:
+            return "ad.Variable(val={},\n name='{}', \n der={}, \n der2= {})".format(self.val,self.name,self.der,self.der2 )
+
     def __pos__(self):
         """Returns the Variable itself. Does nothing to value or derivative."""
         return Variable(self.val, der=self.der, der2=self.der2)
