@@ -1,7 +1,12 @@
-from AutoDiff import Variable
+from AutoDiff.AutoDiff import Variable
 import numpy as np
 from scipy.sparse.linalg import gmres, LinearOperator
 
+A = np.array([[2, 3, 2], 
+               [3, 2, 1],
+               [3, 3, 3]])
+b = np.array([1, 2, 3])
+    
 def grad(p):
     """Calculates derivatives of Ax where A is a matrix using forward mode automatic differentiation
     
@@ -26,11 +31,13 @@ def grad(p):
         J[i] = [v[0] for k, v in sorted(f[i].der.items())]
     return np.dot(J, p)
 
-def gmres_autodiff(b, grad):
+def gmres_autodiff(A, b, grad):
     """Solves Ax=b using GMRes with automatic differentiation
     
     Parameters
     ==========
+    A:     np.array (1d)
+           A in Ax=b
     b:     np.array (1d)
            RHS of Ax=b
     grad:  function
@@ -46,7 +53,7 @@ def gmres_autodiff(b, grad):
     >>> b = np.array([2, 3, 1])
     >>> x, exitcode = gmres_autodiff(b)
     >>> x
-    >>> array([ 1., -1.,  1.])
+    array([ 1., -1.,  1.])
     """
     action = LinearOperator((b.shape[0], b.shape[0]), matvec=grad)
     x, exitcode = gmres(action, b)
