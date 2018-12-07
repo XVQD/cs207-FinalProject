@@ -43,7 +43,6 @@ class Variable:
 
     def __init__(self, val, name=None , der=None, der2=None):
         """Initializes Variable with a value and a derivative."""
-
         self.name=name
         self.val = np.array(val).astype(float)
         try:
@@ -89,7 +88,6 @@ class Variable:
             der={x: a.get(x, 0) + b.get(x, 0) for x in set(a).union(b)}
             a2,b2 = self._expand(a,b,a2,b2)
             der2={x: a2.get(x, 0) + b2.get(x, 0) for x in set(a2).union(b2)}
-            #print(der2)
             return Variable(self.val+other.val, der=der, der2 = der2)
         # other is not a Variable
         except AttributeError:
