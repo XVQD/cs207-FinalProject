@@ -47,5 +47,5 @@ def gmres_autodiff(b, grad):
     """
     dim = b.shape[0]
     action = LinearOperator((dim, dim), matvec=grad)
-    x, exitcode = gmres(action, b)
+    x, exitcode = gmres(action, b, tol=0.001)
     return x
