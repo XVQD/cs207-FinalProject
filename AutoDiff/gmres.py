@@ -1,7 +1,7 @@
 from AutoDiff.AutoDiff import Variable
 import numpy as np
 from scipy.sparse.linalg import gmres, LinearOperator
-from demos.GLOBAL_VARS import F, b
+from tests.GLOBAL_VARS import F
 
 
 def grad(p):
