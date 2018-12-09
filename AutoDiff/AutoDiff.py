@@ -17,13 +17,16 @@ class Variable:
     der      : (optional) dict of str keys and float/int values
                str keys correspond to variable names, and values are floats/ints corresponding to the partial
                derivative with respect to the name key
-               
+    der2     : (optional) dict of str keys and float/int values
+               str keys correspond to variable names, and values are floats/ints corresponding to the partial 
+               second derivative with respect to the name key
     Output
     ==========
     Variable : object
-               the instantiation of the class Variable which represents the variable desired. Contains
-               Variable.val, which is the variable's current value, and Variable.der, which is the variable's
-               current dictionary of partial derivatives
+               the instantiation of the class Variable which represents the variable desired. Contains:
+               Variable.val, which is the variable's current value; Variable.der, which is the variable's
+               current dictionary of partial derivatives; Variable.der2, which is the variable's
+               current dictionary of partial second derivatives;
 
     Methods
     ==========
@@ -37,8 +40,8 @@ class Variable:
     >>> x2 = x1 + 1
     >>> x3 = Variable(7, name='x3')
     >>> x4 =  x2 * x3
-    >>> print(x4.val, x4.der)  # only calculate derivatives of registered(i.e.named) independent variables 
-    14 {'x1': 7, 'x3': 2} 
+    >>> print(x4.val, x4.der, x4.der2)  # only calculate derivatives of registered(i.e.named) independent variables 
+    14.0 {'x1': array([7.]), 'x3': array([2.])} {'x1x1': array([0.]), 'x1x3': array([1.]), 'x3x1': array([1.]), 'x3x3': array([0.])}
     """
 
     def __init__(self, val, name=None , der=None, der2=None):
