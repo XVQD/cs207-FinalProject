@@ -248,7 +248,6 @@ class Variable:
     def hessian(self,lis):
         n=len(lis)
         output=np.ndarray((n,n))
-        print(output)
         for (i,s1) in enumerate(lis):
             for (j,s2) in enumerate(lis):
                 output[i,j]=self.der2[s1+s2]
