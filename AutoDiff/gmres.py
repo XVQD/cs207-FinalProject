@@ -1,27 +1,28 @@
 from AutoDiff.AutoDiff import Variable
 import numpy as np
 from scipy.sparse.linalg import gmres, LinearOperator
-from tests.GLOBAL_VARS import F, b
+#from tests.GLOBAL_VARS import F, b
 
+def autograd(F):
+    def grad(p):
+        """Calculates derivatives of Ax where A is a matrix using forward mode automatic differentiation
 
-def grad(p):
-    """Calculates derivatives of Ax where A is a matrix using forward mode automatic differentiation
-    
-    Parameters
-    ==========
-    p:  np.array
-        the vector p in Jp matrix-vector product where J is the Jacobian
+        Parameters
+        ==========
+        p:  np.array
+            the vector p in Jp matrix-vector product where J is the Jacobian
 
-    Returns
-    =======
-    np.array
-    dot product of J and p
-    """
-    dim = len(F)
-    J = np.zeros((dim, dim))
-    for i in range(dim):
-        J[i] = [v[0] for k, v in sorted(F[i].der.items())]
-    return np.dot(J, p)
+        Returns
+        =======
+        np.array
+        dot product of J and p
+        """
+        dim = len(F)
+        J = np.zeros((dim, dim))
+        for i in range(dim):
+            J[i] = [v[0] for k, v in sorted(F[i].der.items())]
+        return np.dot(J, p)
+    return grad
 
 def gmres_autodiff(b, grad):
     """Solves Ax=b using GMRes with automatic differentiation
