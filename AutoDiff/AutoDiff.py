@@ -59,7 +59,7 @@ class Variable:
 
     def __str__(self):
         if self.name==None:
-            return "ad.Variable(val={})".format(self.val )
+            return "ad.Variable(val={},\n name='function (dependent variable)', \n der={}, \n der2= {})".format(self.val,self.der,self.der2 )
         else:
             return "ad.Variable(val={},\n name='{}', \n der={}, \n der2= {})".format(self.val,self.name,self.der,self.der2 )
 
