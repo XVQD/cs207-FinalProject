@@ -1,16 +1,16 @@
 import AutoDiff as ad
 import numpy as np
 
-def grad_desc(f, point, gamma, precision = 0.00001, max_iters = 10000, message=True):
+def grad_desc(f, init, gamma, precision = 0.00001, max_iters = 10000, message=True):
 	'''Performs the gradient descent on a function or vector function of scalars.
 
 	INPUT
 	=========
 	f         : function
-	            the objective function that returns AutoDiff.Variable class;
+	            the objective function that returns AutmoDiff.Variable class;
 	            has 1 argument -- a list of numbers that correspond to values at which
 	            variable are evaluated
-	point     : dictionary
+	init      : dictionary
 			    variable string key:int/float value pair that represents the variables
 			    at which they are evaluated.
 			    assumes length matches the number of unique variables in f
@@ -60,7 +60,7 @@ def grad_desc(f, point, gamma, precision = 0.00001, max_iters = 10000, message=T
 
 	iters = 0
 
-	curr_point = point.copy()
+	curr_point = init.copy()
 
 	prev_diff = float('inf')
 
