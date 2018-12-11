@@ -8,16 +8,16 @@ class Variable:
     
     Parameters (instantiating a Variable object)
     ==========
-    val      : float or int
-               the value at we wish to evaluate this variable
+    val      : np.array
+               the value(s) at we wish to evaluate this variable
     name     : (optional) string
                name of the variable; suggested that the name should match the name of the Variable created
                If name is not supplied, then a new variable has not been created, but rather a combination
                of other variables has occurred
-    der      : (optional) dict of str keys and float/int values
+    der      : (optional) dict of str keys and np.array of float/int values
                str keys correspond to variable names, and values are floats/ints corresponding to the partial
                derivative with respect to the name key
-    der2     : (optional) dict of str keys and float/int values
+    der2     : (optional) dict of str keys and np.array of float/int values
                str keys correspond to variable names, and values are floats/ints corresponding to the partial 
                second derivative with respect to the name key
     Output
