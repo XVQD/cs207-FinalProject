@@ -62,7 +62,7 @@ def NewtonOpt(f, init, precision = 0.00001, max_iters = 10000, message=True):
 		f2x= f(prev_point)
 		gradf =[]
 		for var in init.keys():
-				gradf.append(f2x.der[var])
+			gradf.append(f2x.der[var])
 		gradf=np.array(gradf).flatten()
 		
 		# initializing list of differences between new point and old point
