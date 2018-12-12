@@ -114,3 +114,8 @@ class Test_second_derivatives():
         x1 = Variable(1, name='x1')
         z1 = AutoDiff.sqrt(x1)
         assert z1.der2['x1x1'][0] == -0.25
+
+    def test_sigmoid(self):
+        x1 = Variable(0, name='x1')
+        z1 = AutoDiff.sigmoid(x1)
+        assert z1.der2['x1x1'][0] == 0
