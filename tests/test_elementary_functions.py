@@ -48,3 +48,9 @@ class Test_Elementary_functions():
         assert x4.der == {'x1': 1.005037815259212, 
             'x2':  -1.0206207261596576,
             'x3': 0.9174311926605504}
+
+    def test_sqrt(self):
+        x1 = Variable(1, name='x1')
+        x2 = AutoDiff.sqrt(x1)
+        assert x2.val == 1
+        assert x2.der == {'x1': 0.5}
