@@ -41,8 +41,8 @@ def NewtonOpt(f, init, precision = 0.00001, max_iters = 10000, message=True):
 	...     Z2 = ad.exp(-(X - 1)**2 - (Y - 1)**2)
 	...     return (Z1 - Z2) * 2
 	...       
->>> initp ={'x':.8,'y':1.4}
->>> NewtonOpt(f,initp,message=False)
+	>>> initp ={'x':.8,'y':1.4}
+	>>> NewtonOpt(f,initp,message=False)
    Number of iterations: 5
    {'point': {'x': 1.099839320128867, 'y': 1.099839320128867}, 'iters': 5}
 	'''
@@ -68,11 +68,9 @@ def NewtonOpt(f, init, precision = 0.00001, max_iters = 10000, message=True):
 		# initializing list of differences between new point and old point
 
 		hess=f2x.hessian(init.keys())
-		#print(hess,curr_point)
 		        
 		sk=np.linalg.solve(hess,-gradf).reshape(-1)
 		# update each coordinate and append difference
-		#print(curr_point+sk)
 		ii=0
 		for var in init.keys():
            # print(curr_point)
