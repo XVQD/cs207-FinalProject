@@ -392,3 +392,13 @@ def arctan(obj):
     val = np.arctan(obj.val)
     return Variable(val, der = der, der2 = der2)
 
+def sqrt(obj):
+    """Returns the square root of the Variable."""
+    a = obj.der
+    a2 = obj.der2
+    der = {x: 0.5*obj.val**(0.5-1) * a.get(x, 0) for x in set(a)} 
+    der2 = {}
+    for x in set(a):
+        for y in set(a):
+            der2[x+y] = 0.5*obj.val**(0.5-2)*((0.5-1)*a.get(x, 0)*a.get(y,0) + obj.val*a2.get(x+y, 0))
+    return Variable(obj.val ** 0.5, der= der, der2 = der2)
