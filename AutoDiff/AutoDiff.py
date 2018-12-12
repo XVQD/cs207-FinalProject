@@ -402,3 +402,8 @@ def sqrt(obj):
         for y in set(a):
             der2[x+y] = 0.5*obj.val**(0.5-2)*((0.5-1)*a.get(x, 0)*a.get(y,0) + obj.val*a2.get(x+y, 0))
     return Variable(obj.val ** 0.5, der= der, der2 = der2)
+
+def sigmoid(obj):
+    """Returns the logistic function value, 1st der and 2nd der of the Variable."""
+    x = 1/(1+exp(-1*obj))
+    return x
