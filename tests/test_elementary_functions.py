@@ -54,3 +54,9 @@ class Test_Elementary_functions():
         x2 = AutoDiff.sqrt(x1)
         assert x2.val == 1
         assert x2.der == {'x1': 0.5}
+
+    def test_sigmoid(self):
+        x1 = Variable(0, name='x1')
+        x2 = AutoDiff.sigmoid(x1)
+        assert x2.val == 0.5
+        assert x2.der == {'x1': 0.25}
