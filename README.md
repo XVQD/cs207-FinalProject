@@ -2,6 +2,8 @@
 
 by Zizheng Xu, Hurlink Vongsachang, Yanying Qiu, Bolei Deng
 
+See Documentation.ipynb under /docs for more comprehensible mathematical notations.
+
 [![Build Status](https://travis-ci.org/XVQD/cs207-FinalProject.svg?branch=master)](https://travis-ci.org/XVQD/cs207-FinalProject.svg?branch=master)
 
 [![Coverage Status](https://coveralls.io/repos/github/XVQD/cs207-FinalProject/badge.svg?branch=master)](https://coveralls.io/github/XVQD/cs207-FinalProject?branch=master)
