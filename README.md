@@ -1,4 +1,6 @@
-# Automatic Differentiation
+# AutoDiff-XVQD: Package for Automatic Differentiation
+
+by Zizheng Xu, Hurlink Vongsachang, Yanying Qiu, Bolei Deng
 
 [![Build Status](https://travis-ci.org/XVQD/cs207-FinalProject.svg?branch=master)](https://travis-ci.org/XVQD/cs207-FinalProject.svg?branch=master)
 
